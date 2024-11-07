@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const Region = require('./models/Region');
 const Auction = require('./models/Auction');
+const Bid = require('./models/Bid');
 
 mongoose.connect('mongodb://localhost:27017/real_estate_auction', {
   useNewUrlParser: true,
@@ -13,39 +15,44 @@ const seedData = async () => {
   try {
     console.log('Deleting existing data...');
     await User.deleteMany({});
-    console.log('Users deleted');
     await Region.deleteMany({});
-    console.log('Regions deleted');
     await Auction.deleteMany({});
-    console.log('Auctions deleted');
+    await Bid.deleteMany({});
+    console.log('Existing data deleted');
 
     // Insert sample users
     console.log('Inserting sample users...');
+    const adminPassword = await bcrypt.hash('adminpassword', 10);
+    const memberPassword = await bcrypt.hash('memberpassword', 10);
+
     const adminUser = new User({
       username: 'admin',
       email: 'admin@example.com',
-      password: 'adminpassword', // use bcrypt to hash in real setup
+      password: adminPassword,
       role: 'admin',
     });
+
     const memberUser = new User({
       username: 'member',
       email: 'member@example.com',
-      password: 'memberpassword',
+      password: memberPassword,
       role: 'member',
     });
 
     await adminUser.save();
-    console.log('Admin user saved');
     await memberUser.save();
-    console.log('Member user saved');
+    console.log('Admin and member users saved');
 
-    // Insert sample region
+    // Insert a sample region
     console.log('Inserting sample region...');
-    const region = new Region({ name: 'Region A', description: 'Sample region description' });
+    const region = new Region({
+      name: 'Region A',
+      description: 'Sample region description',
+    });
     await region.save();
     console.log('Region saved with ID:', region._id);
 
-    // Insert sample auction
+    // Insert a sample auction in the region
     console.log('Inserting sample auction...');
     const auction = new Auction({
       title: 'Auction 1',
@@ -54,9 +61,25 @@ const seedData = async () => {
       regionId: region._id,
       endDate: new Date('2025-12-31'),
     });
-
     await auction.save();
     console.log('Auction saved with ID:', auction._id);
+
+    // Insert sample bids for the auction
+    console.log('Inserting sample bids...');
+    const bid1 = new Bid({
+      auctionId: auction._id,
+      userId: memberUser._id,
+      amount: 150,
+    });
+    const bid2 = new Bid({
+      auctionId: auction._id,
+      userId: memberUser._id,
+      amount: 200,
+    });
+
+    await bid1.save();
+    await bid2.save();
+    console.log('Sample bids saved with IDs:', bid1._id, bid2._id);
 
     console.log('Sample data added successfully!');
   } catch (error) {

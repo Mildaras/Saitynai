@@ -1,33 +1,61 @@
 •	Projekto pavadinimas: Nekilnojamo turto aukcionas.
 
 •	Funkciniai reikalavimai: 
-1.	Vartotojo Registracija ir Prisijungimas
-2.	Vartotojo Rolės: Sistema turi palaikyti tris vartotojo roles: svečias, narys ir administratorius.
-3.	Svečias: Gali peržiūrėti regionus ir aukcionus.
-4.	Narys: Gali peržiūrėti regionus ir aukcionus bei dalyvauti aukcionuose pateikdamas statymus.
-5.	Administratorius: Gali valdyti regionus, aukcionus ir vartotojų statymus.
-6.	Regionų Sąrašas: Vartotojai gali peržiūrėti visus galimus regionus.
-7.	Regiono Sukūrimas: Administratoriai gali pridėti naujus regionus.
-8.	Regiono Redagavimas: Administratoriai gali redaguoti esamus regionus.
-9.	Regiono Pašalinimas: Administratoriai gali pašalinti regionus.
-10.	Aukcionų Sąrašas: Vartotojai gali peržiūrėti visus aukcionus arba filtravus pagal regioną.
-11.	Aukciono Informacija: Vartotojai gali peržiūrėti konkretaus aukciono detales, tokias kaip aukciono pavadinimas, aprašymas, pradinė kaina ir pabaigos data.
-12.	Aukciono Sukūrimas: Administratoriai gali pridėti naujus aukcionus.
-13.	Aukciono Redagavimas: Administratoriai gali redaguoti esamus aukcionus.
-14.	Aukciono Pašalinimas: Administratoriai gali pašalinti aukcionus.
-15.	Statymo Pateikimas: Nariai gali pateikti statymus ant aktyvių aukcionų.
-16.	Statymų Sąrašas: Vartotojai gali peržiūrėti visus pateiktus statymus tam tikram aukcionui.
-17.	Statymo Atšaukimas: Nariai gali atšaukti savo statymus iki aukciono pabaigos.
-18.	Regiono Pasirinkimas: Vartotojai gali pasirinkti regioną ir peržiūrėti tik tame regione esančius aukcionus.
-19.	Paieška ir Filtravimas: Vartotojai gali ieškoti ir filtruoti aukcionus pagal įvairius kriterijus (pvz., regioną, kainą, datą).
-20.	Aukciono Statistika: Administratoriai gali peržiūrėti aukcionų statistiką, tokią kaip dalyvaujančių vartotojų skaičius, pateiktų statymų skaičius ir aukciono pajamos.
-21.	Autentifikacija: Vartotojų autentifikacija naudojant JWT arba OAUTH2.
-22.	Autorizacija: Sistemos funkcijų prieinamumas pagal vartotojo rolę.
+
+## API Endpoints
+
+### User Management
+
+| Endpoint               | Description                                     | Access       |
+|------------------------|-------------------------------------------------|--------------|
+| `POST /users/register` | Registers a new user                            | Public       |
+| `POST /users/login`    | Authenticates a user and returns a JWT          | Public       |
+| `GET /users/profile`   | Retrieves the profile of the logged-in user     | Requires JWT |
+
+### Region Management
+
+| Endpoint                   | Description                                         | Access        |
+|----------------------------|-----------------------------------------------------|---------------|
+| `GET /regions`             | Lists all regions                                   | Public        |
+| `POST /regions`            | Creates a new region                                | Admin only    |
+| `PUT /regions/:regionId`   | Updates details of an existing region               | Admin only    |
+| `DELETE /regions/:regionId`| Deletes a region                                    | Admin only    |
+
+### Auction Management
+
+| Endpoint                       | Description                                         | Access        |
+|--------------------------------|-----------------------------------------------------|---------------|
+| `GET /auctions`                | Lists all auctions                                  | Public        |
+| `GET /auctions/:auctionId`     | Retrieves details of a specific auction             | Public        |
+| `POST /auctions`               | Creates a new auction                               | Admin only    |
+| `PUT /auctions/:auctionId`     | Updates an auction                                  | Admin only    |
+| `DELETE /auctions/:auctionId`  | Deletes an auction                                  | Admin only    |
+
+### Bid Management
+
+| Endpoint                                 | Description                                        | Access             |
+|------------------------------------------|----------------------------------------------------|--------------------|
+| `POST /auctions/:auctionId/bids`         | Places a bid on an auction                         | Member only        |
+| `GET /auctions/:auctionId/bids`          | Lists all bids for a specific auction              | Member/Admin       |
+| `DELETE /auctions/:auctionId/bids/:bidId`| Cancels a bid if the auction is still open         | Member (owner)     |
+
+---
+
+### Notes
+
+- **Public Access**: Available to all users without authentication.
+- **Requires JWT**: Requires a valid JWT in the `Authorization` header.
+- **Admin Only**: Requires the user to have an admin role.
+- **Member Only**: Requires the user to have a member role, typically granted after registration.
+- **Member (owner)**: Requires the user to have placed the bid they are attempting to cancel.
+
+---
     
 •	 Pasirinktų technologijų aprašymas:
 1.	React.js – Dinamiškam UI, frontend.
 2.	Node.js ir Express.js – API, backend.
 3.	JWT (JSON Web Tokens) – patvirtinimui ir autentifikacijai.
 4.	Cloud – nenusprendžiau.
+5.  MonongoDB duomenu baze.
  
 

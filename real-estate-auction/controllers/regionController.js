@@ -1,7 +1,7 @@
 const Region = require('../models/Region');
 
-// Get all regions
-exports.getAllRegions = async (req, res) => {
+// List all regions
+exports.listRegions = async (req, res) => {
   try {
     const regions = await Region.find();
     res.status(200).json(regions);
@@ -12,11 +12,12 @@ exports.getAllRegions = async (req, res) => {
 
 // Create a new region
 exports.createRegion = async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+
   try {
-    const { name, description } = req.body;
-    const newRegion = new Region({ name, description });
-    await newRegion.save();
-    res.status(201).json(newRegion);
+    const region = new Region(req.body);
+    await region.save();
+    res.status(201).json(region);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -24,10 +25,13 @@ exports.createRegion = async (req, res) => {
 
 // Update a region by ID
 exports.updateRegion = async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+
   try {
-    const updatedRegion = await Region.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedRegion) return res.status(404).json({ error: 'Region not found' });
-    res.status(200).json(updatedRegion);
+    const region = await Region.findByIdAndUpdate(req.params.regionId, req.body, { new: true });
+    if (!region) return res.status(404).json({ error: 'Region not found' });
+
+    res.status(200).json(region);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -35,10 +39,13 @@ exports.updateRegion = async (req, res) => {
 
 // Delete a region by ID
 exports.deleteRegion = async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Forbidden' });
+
   try {
-    const deletedRegion = await Region.findByIdAndDelete(req.params.id);
-    if (!deletedRegion) return res.status(404).json({ error: 'Region not found' });
-    res.status(200).json({ message: 'Region deleted successfully' });
+    const region = await Region.findByIdAndDelete(req.params.regionId);
+    if (!region) return res.status(404).json({ error: 'Region not found' });
+
+    res.status(200).json({ message: 'Region deleted' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
