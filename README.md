@@ -1,6 +1,4 @@
-•	Projekto pavadinimas: Nekilnojamo turto aukcionas.
-
-•	Funkciniai reikalavimai: 
+####	Projekto pavadinimas: Nekilnojamo turto aukcionas.
 
 ## API Endpoints
 
@@ -51,11 +49,11 @@
 
 ---
     
-•	 Pasirinktų technologijų aprašymas:
-1.	React.js – Dinamiškam UI, frontend.
-2.	Node.js ir Express.js – API, backend.
-3.	JWT (JSON Web Tokens) – patvirtinimui ir autentifikacijai.
-4.	Cloud – nenusprendžiau.
-5.  MonongoDB duomenu baze.
+### Pasirinktų technologijų aprašymas:
+- **React.js – Dinamiškam UI, frontend.**
+- **Node.js ir Express.js – API, backend.**
+- **JWT (JSON Web Tokens) – patvirtinimui ir autentifikacijai.**
+- **Cloud – Google Cloud.**
+- **MonongoDB duomenu baze.**
  
 
