@@ -3,9 +3,9 @@ const { listAuctions, getAuctionDetails, createAuction, updateAuction, deleteAuc
 const { protect } = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.get('/', listAuctions);
-router.get('/:auctionId', getAuctionDetails);
-router.post('/', protect, createAuction);
+router.get('/:regionId', listAuctions);
+router.get('/:auctionId/details', getAuctionDetails);
+router.post('/:regionId', protect, createAuction);
 router.put('/:auctionId', protect, updateAuction);
 router.delete('/:auctionId', protect, deleteAuction);
 

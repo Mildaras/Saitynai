@@ -8,7 +8,7 @@ exports.placeBid = async (req, res) => {
     }
   
     try {
-      const { auctionId } = req.params;
+      const { auctionId } = req.params.auctionId;
       const { amount } = req.body;
   
       // Ensure the auction exists
@@ -41,19 +41,24 @@ exports.listBidsForAuction = async (req, res) => {
   }
 };
 
-// Cancel a bid by ID (e.g., if user wants to remove their bid)
 exports.cancelBid = async (req, res) => {
-    try {
-      const { bidId } = req.params;
-  
-      // Find the bid by ID and ensure it belongs to the current user
-      const bid = await Bid.findOne({ _id: bidId, userId: req.user.userId });
-      if (!bid) return res.status(404).json({ error: 'Bid not found' });
-  
-      // Delete the bid
-      await Bid.deleteOne({ _id: bidId });
-      res.status(200).json({ message: 'Bid cancelled successfully' });
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  };
+  const { auctionId, bidId } = req.params;
+
+  try {
+      const auction = await Auction.findById(auctionId);
+      if (!auction) return res.status(404).json({ error: 'Auction not found' });
+
+      const bidIndex = auction.bids.findIndex((bid) => bid._id.toString() === bidId);
+      if (bidIndex === -1) return res.status(404).json({ error: 'Bid not found' });
+
+      // Remove the bid
+      auction.bids.splice(bidIndex, 1);
+      await auction.save();
+
+      res.status(200).json({ message: 'Bid deleted successfully.' });
+  } catch (err) {
+      console.error('Error deleting bid:', err.message);
+      res.status(500).json({ error: 'Failed to delete bid.' });
+  }
+};
+

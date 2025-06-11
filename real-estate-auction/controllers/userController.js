@@ -22,7 +22,7 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// User login
+// User login function that issues both access and refresh tokens
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -32,11 +32,15 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    });
+    // Generate both access and refresh tokens
+    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken(user, refreshToken);
 
-    res.status(200).json({ token });
+    // Send the tokens back to the client
+    res.status(200).json({
+      accessToken,
+      refreshToken
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -53,3 +57,45 @@ exports.getUserProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Function to generate access token
+const generateAccessToken = (user, refresh) => {
+  return jwt.sign(
+    { userId: user._id, role: user.role, token: refresh },
+    process.env.JWT_SECRET,
+    { expiresIn: '10m' } // Access token expires in 10 minutes
+  );
+};
+
+// Function to generate refresh token
+const generateRefreshToken = (user) => {
+  return jwt.sign(
+    { userId: user._id },
+    process.env.REFRESH_TOKEN_SECRET, // Separate secret for refresh tokens
+    { expiresIn: '2h' } 
+  );
+};
+
+exports.refreshToken = (req, res) => {
+  const { accessToken } = req.body;
+
+  if (!accessToken) {
+    return res.status(401).json({ error: 'Access token is required' });
+  }
+
+  const refreshToken = jwt.decode(accessToken).token;
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid or expired refresh token' });
+
+    // Generate a new access token
+    const newAccessToken = jwt.sign(
+      { userId: user.userId, role: user.role, token: refreshToken},
+      process.env.JWT_SECRET,
+      { expiresIn: '10m' }
+    );
+
+    res.status(200).json({ accessToken: newAccessToken });
+  });
+};
+

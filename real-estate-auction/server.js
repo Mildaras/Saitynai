@@ -1,13 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const regionRoutes = require('./routes/regionRoutes');
 const auctionRoutes = require('./routes/auctionRoutes');
 const bidRoutes = require('./routes/bidRoutes');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+app.use(cors({ origin: 'http://localhost:3001' }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -15,9 +18,11 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRoutes);
-app.use('/regions', regionRoutes);
+
+app.use('/regions', regionRoutes);                // Routes related to regions
 app.use('/auctions', auctionRoutes);
-app.use('/auctions', bidRoutes);
+app.use('/auctions/bids', bidRoutes);
+app.use(errorHandler);
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,

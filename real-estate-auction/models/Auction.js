@@ -6,7 +6,14 @@ const auctionSchema = new mongoose.Schema({
   description: { type: String },
   startingPrice: { type: Number, required: true },
   regionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Region', required: true },
-  endDate: { type: Date, required: true },
+  endDate: {
+    type: Date,
+    required: true,
+    validate: {
+      validator: (value) => value > Date.now(),
+      message: 'End date must be in the future.',
+    },
+  },  
 }, { timestamps: true });
 
 // Export the model
